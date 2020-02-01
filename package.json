@@ -1,0 +1,16 @@
+{
+  "name": "drawio_mermaid_plugin",
+  "version": "0.0.1",
+  "description": "Drawio mermaid shapes",
+  "main": "mermaid.js",
+  "scripts": {
+    "browserify": "browserify mermaid.js -o build/mermaid.js"
+  },
+  "files": [
+    "mermaid.js"
+  ],
+  "dependencies": {
+    "browserify": "^16.5.0",
+    "mermaid": "^8.4.6"
+  }
+}
