@@ -11,7 +11,8 @@ mermaid.mermaidAPI.initialize({
 function mxShapeMermaid(bounds, fill, stroke, strokewidth) {
 	mxShape.call(this);
 	this.bounds = bounds;
-	this.image = '';
+  this.image = '';
+  this.error = '';
 	this.mermaidOutput = '';
 	this.fill = fill;
 	this.stroke = stroke;
@@ -31,16 +32,22 @@ mxShapeMermaid.prototype.customProperties = [
 ];
 
 mxShapeMermaid.prototype.updateImage = function () {
-	if (!document.querySelector("#mermaid")) {
-		var element = document.createElement("svg");
-		element.setAttribute("style","display:none;");
-		element.setAttribute("width","100");
-		element.setAttribute("height","100");
-		element.setAttribute("id","mermaid");
-		document.body.appendChild(element);
-	}
-	mermaid.mermaidAPI.render('mermaid',this.state.cell.value, (svg) => { this.mermaidOutput = svg; });
-	this.image = 'data:image/svg+xml;base64,' + btoa(this.mermaidOutput);
+  try {
+    if (!document.querySelector("#mermaid-"+this.state.cell.id)) {
+      var element = document.createElement("svg");
+      element.setAttribute("style","display:none;");
+      element.setAttribute("width","100");
+      element.setAttribute("height","100");
+      element.setAttribute("id","mermaid-"+this.state.cell.id);
+      document.body.appendChild(element);
+    }
+
+    mermaid.mermaidAPI.render('mermaid-'+this.state.cell.id,this.state.cell.value, (svg) => { this.mermaidOutput = svg; });
+    this.image = 'data:image/svg+xml;base64,' + btoa(this.mermaidOutput);
+    this.error = '';
+  } catch (err) {
+    this.error = err.message;
+  }
 }
 
 /**
@@ -49,11 +56,20 @@ mxShapeMermaid.prototype.updateImage = function () {
 * Paints the vertex shape.
 */
 mxShapeMermaid.prototype.paintVertexShape = function (c, x, y, w, h) {
-	c.root.setAttribute('id','123');
 	if (!this.image) {
 		this.updateImage();
-	}
-	c.image(x, y, w, h, this.image, this.preserveImageAspect, false, false);
+  }
+  try {
+    if (!this.error) {
+      c.image(x, y, w, h, this.image, this.preserveImageAspect, false, false);
+    }
+  } catch (err) {
+    this.error = err.message;
+  }
+  if (this.error) {
+    c.text(x, y, w, h, this.error, mxConstants.ALIGN_LEFT, mxConstants.ALIGN_MIDDLE, true, 'html', 0, 0, 0);
+		c.stroke();
+  }
 	this.state.cell.valueChanged = (value) => { mxCell.prototype.valueChanged.call(this.state.cell, value); this.updateImage(); this.redraw(); }
 }
 
@@ -124,7 +140,7 @@ cherry :active, c, after b a, 1d
     this.createVertexTemplateEntry(style, 900, 100, gantt,        'Gantt Diagram',    null, null, this.getTagsForStencil('mxgraph.mermaid.abstract', 'mermaid', 'gantt ').join(' ')),
     this.createVertexTemplateEntry(style, 100, 240, state,        'State Diagram',    null, null, this.getTagsForStencil('mxgraph.mermaid.abstract', 'mermaid', 'state ').join(' ')),
     this.createVertexTemplateEntry(style, 280, 200, graph,        'Flow Chart',       null, null, this.getTagsForStencil('mxgraph.mermaid.abstract', 'mermaid', 'flow ').join(' ')),
-    this.createVertexTemplateEntry(style, 100, 100, classDiagram, 'Class Diagram',    null, null, this.getTagsForStencil('mxgraph.mermaid.abstract', 'mermaid', 'class ').join(' ')),
+    this.createVertexTemplateEntry(style, 340, 200, classDiagram, 'Class Diagram',    null, null, this.getTagsForStencil('mxgraph.mermaid.abstract', 'mermaid', 'class ').join(' ')),
   ]);
 }
   
