@@ -14,6 +14,9 @@ via a simple markup language
 
 ![overview](doc/overview.png)
 
+## Online Demo
+[Online Demo](https://nopeslide.github.io/drawio/?p=mermaid)
+
 ## Usage
 
 * double click on a shape and edit the mermaid script, the shape will be redrawn after leaving the editor
