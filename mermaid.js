@@ -48,7 +48,7 @@ mxShapeMermaid.prototype.updateImage = function () {
     }
 
     mermaid.mermaidAPI.render('mermaid-'+this.state.cell.id,this.state.cell.value, (svg) => { this.mermaidOutput = svg; }, container);
-    this.image = 'data:image/svg+xml;base64,' + btoa(this.mermaidOutput);
+    this.image = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(this.mermaidOutput)));
     this.error = '';
   } catch (err) {
     this.error = err.message;
