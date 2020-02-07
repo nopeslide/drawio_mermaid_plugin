@@ -32,16 +32,22 @@ mxShapeMermaid.prototype.customProperties = [
 
 mxShapeMermaid.prototype.updateImage = function () {
   try {
+    var container = document.querySelector("#cmermaid-"+this.state.cell.id)
+    if (!container) {
+      container = document.createElement("div");
+      container.setAttribute("id","cmermaid-"+this.state.cell.id);
+      document.body.appendChild(container);
+    }
     if (!document.querySelector("#mermaid-"+this.state.cell.id)) {
       var element = document.createElement("svg");
       element.setAttribute("style","display:none;");
       element.setAttribute("width","100");
       element.setAttribute("height","100");
       element.setAttribute("id","mermaid-"+this.state.cell.id);
-      document.body.appendChild(element);
+      container.appendChild(element);
     }
 
-    mermaid.mermaidAPI.render('mermaid-'+this.state.cell.id,this.state.cell.value, (svg) => { this.mermaidOutput = svg; });
+    mermaid.mermaidAPI.render('mermaid-'+this.state.cell.id,this.state.cell.value, (svg) => { this.mermaidOutput = svg; }, container);
     this.image = 'data:image/svg+xml;base64,' + btoa(this.mermaidOutput);
     this.error = '';
   } catch (err) {
