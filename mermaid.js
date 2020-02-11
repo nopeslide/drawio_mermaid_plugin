@@ -164,7 +164,7 @@ mxShapeMermaid.prototype.paintVertexShape = function (c, x, y, w, h) {
     c.text(x, y+h/2, 0, 0, '<pre>' + this.error + '</pre>', mxConstants.ALIGN_LEFT, mxConstants.ALIGN_MIDDLE, false, 'html', 0, 0, 0);
     c.stroke();
   }
-  this.state.cell.valueChanged = (value) => { mxCell.prototype.valueChanged.call(this.state.cell, value); this.updateImage(); this.redraw(); }
+  this.state.cell.valueChanged = (value) => { var lastValue = mxCell.prototype.valueChanged.call(this.state.cell, value); this.updateImage(); this.redraw(); return lastValue; }
 }
 
 mxCellRenderer.registerShape(mxShapeMermaid.prototype.cst.SHAPE_MERMAID, mxShapeMermaid);
