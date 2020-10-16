@@ -1,16 +1,42 @@
 {
-  "name": "drawio_mermaid_plugin",
-  "version": "0.0.1",
-  "description": "Drawio mermaid shapes",
-  "main": "mermaid.js",
-  "scripts": {
-    "browserify": "browserify mermaid.js -o build/mermaid.js"
-  },
-  "files": [
-    "mermaid.js"
-  ],
-  "dependencies": {
-    "browserify": "^16.5.0",
-    "mermaid": "^8.4.6"
-  }
+	"name": "vscode-drawio-plugin-mermaid",
+	"displayName": "Draw.io Integration: Mermaid plugin",
+	"description": "Mermaid plugin for Draw.io Integration",
+	"version": "0.0.1",
+	"publisher": "nopeslide",
+	"repository": "https://github.com/nopeslide/drawio_mermaid_plugin",
+	"readme": "./README.md",
+	"icon": "doc/logo.drawio.png",
+	"engines": {
+		"vscode": "^1.34.0"
+	},
+	"categories": [
+		"Visualization"
+	],
+	"activationEvents": [
+		"*"
+	],
+	"main": "dist/vscode_extension.js",
+	"contributes": {},
+	"scripts": {
+		"vscode:prepublish": "npm run build",
+		"webpack": "webpack --mode production",
+		"compile": "tsc -p ./",
+		"build": "npm run webpack && npm run compile",
+		"lint": "eslint . --ext .ts,.tsx",
+		"watch": "tsc -watch -p ./"
+	},
+	"devDependencies": {
+		"@types/node": "^12.12.0",
+		"@types/vscode": "^1.34.0",
+		"@typescript-eslint/eslint-plugin": "^3.0.2",
+		"@typescript-eslint/parser": "^3.0.2",
+		"eslint": "^7.1.0",
+		"typescript": "^4.0.2",
+		"vsce": "^1.81.1",
+		"webpack": "^4.44.2",
+		"webpack-cli": "^3.3.12",
+		"mermaid": "^8.8.1"
+	},
+	"isDrawioExtension": true
 }

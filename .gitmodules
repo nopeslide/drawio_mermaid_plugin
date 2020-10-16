@@ -1,0 +1,3 @@
+[submodule "src/vscode-drawio"]
+	path = src/vscode-drawio
+	url = git@github.com:hediet/vscode-drawio.git

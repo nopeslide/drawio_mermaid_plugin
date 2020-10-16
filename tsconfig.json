@@ -1,0 +1,16 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"target": "es2019",
+		"lib": ["ES2019"],
+		"outDir": "dist",
+		"sourceMap": true,
+		"strict": true,
+		"rootDir": "src",
+		"allowJs": true
+	},
+	"files": [
+		"src/vscode_extension.ts",
+		"src/vscode-drawio/src/DrawioExtensionApi.ts"
+	]
+}

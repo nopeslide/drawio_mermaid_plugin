@@ -1,0 +1,5 @@
+**/*
+!package.json
+!dist
+!README.md
+!doc/logo.drawio.png
