@@ -13,9 +13,7 @@
 	"categories": [
 		"Visualization"
 	],
-	"activationEvents": [
-		"*"
-	],
+	"activationEvents": [],
 	"main": "dist/vscode_extension.js",
 	"contributes": {},
 	"scripts": {
