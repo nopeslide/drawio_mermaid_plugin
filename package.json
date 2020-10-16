@@ -2,7 +2,7 @@
 	"name": "vscode-drawio-plugin-mermaid",
 	"displayName": "Draw.io Integration: Mermaid plugin",
 	"description": "Mermaid plugin for Draw.io Integration",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"publisher": "nopeslide",
 	"repository": "https://github.com/nopeslide/drawio_mermaid_plugin",
 	"readme": "./README.md",
