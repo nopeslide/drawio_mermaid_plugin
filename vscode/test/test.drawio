@@ -1,0 +1,34 @@
+<mxfile host="65bd71144e" modified="2020-10-17T12:40:52.092Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.49.3 Chrome/83.0.4103.122 Electron/9.2.1 Safari/537.36" etag="W2byidMQ_ejidWRYyrCK" version="13.6.5">
+    <diagram id="4WIfbMqaGbppmE9ICcsf" name="Page-1">
+        <mxGraphModel dx="2332" dy="1878" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="pie title What Voldemort doesn't have?&#10;         &quot;FRIENDS&quot; : 2&#10;         &quot;FAMILY&quot; : 3&#10;         &quot;NOSE&quot; : 45" style="shadow=0;dashed=0;align=left;strokeWidth=1;shape=mxgraph.mermaid.abstract.mermaid;labelBackgroundColor=#ffffff;noLabel=1;" parent="1" vertex="1">
+                    <mxGeometry x="-150" y="-160" width="670" height="670" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="sequenceDiagram&#10;    Alice -&gt;&gt; Bob: Hello Bob, how are you?&#10;    Bob--&gt;&gt;John: How about you John?&#10;    Bob--x Alice: I am good thanks!&#10;    Bob-x John: I am good thanks!&#10;    Note right of John: Bob thinks a long&lt;br/&gt;long time, so long&lt;br/&gt;that the text does&lt;br/&gt;not fit on a row.&#10;&#10;    Bob--&gt;Alice: Checking with John...&#10;    Alice-&gt;John: Yes... John, how are you?" style="shadow=0;dashed=0;align=left;strokeWidth=1;shape=mxgraph.mermaid.abstract.mermaid;labelBackgroundColor=#ffffff;noLabel=1;" parent="1" vertex="1">
+                    <mxGeometry x="350" y="-10" width="500" height="300" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="gantt&#10;apple :a, 2017-07-20, 1w&#10;banana :crit, b, 2017-07-23, 1d&#10;cherry :active, c, after b a, 1d&#10;" style="shadow=0;dashed=0;align=left;strokeWidth=1;shape=mxgraph.mermaid.abstract.mermaid;labelBackgroundColor=#ffffff;noLabel=1;" parent="1" vertex="1">
+                    <mxGeometry x="-550" y="270" width="1070" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="stateDiagram&#10;    [*] --&gt; Still&#10;    Still --&gt; [*]&#10;&#10;    Still --&gt; Moving&#10;    Moving --&gt; Still&#10;    Moving --&gt; Crash&#10;    Crash --&gt; [*]" style="shadow=0;dashed=0;align=left;strokeWidth=1;shape=mxgraph.mermaid.abstract.mermaid;labelBackgroundColor=#ffffff;noLabel=1;" parent="1" vertex="1">
+                    <mxGeometry x="-475" y="440" width="100" height="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="graph LR&#10;   a --&gt; b &amp; c--&gt; d&#10;" style="shadow=0;dashed=0;align=left;strokeWidth=1;shape=mxgraph.mermaid.abstract.mermaid;labelBackgroundColor=#ffffff;noLabel=1;" parent="1" vertex="1">
+                    <mxGeometry x="70" y="480" width="300" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="classDiagram&#10;      Animal &lt;|-- Duck&#10;      Animal &lt;|-- Fish&#10;      Animal &lt;|-- Zebra&#10;      Animal : +int age&#10;      Animal : +String gender&#10;      Animal: +isMammal()&#10;      Animal: +mate()&#10;      class Duck{&#10;          +String beakColor&#10;          +swim()&#10;          +quack()&#10;      }&#10;      class Fish{&#10;          -int sizeInFeet&#10;          -canEat()&#10;      }&#10;      class Zebra{&#10;          +bool is_wild&#10;          +run()&#10;      }&#10;" style="shadow=0;dashed=0;align=left;strokeWidth=1;shape=mxgraph.mermaid.abstract.mermaid;labelBackgroundColor=#ffffff;noLabel=1;" parent="1" vertex="1">
+                    <mxGeometry x="550" y="480" width="300" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="journey&#10;    title My working day&#10;    section Go to work&#10;      Make tea: 5: Me&#10;      Go upstairs: 3: Me&#10;      Do work: 1: Me, Cat&#10;    section Go home&#10;      Go downstairs: 5: Me&#10;      Sit down: 5: Me&#10;" style="shadow=0;dashed=0;align=left;strokeWidth=1;shape=mxgraph.mermaid.abstract.mermaid;labelBackgroundColor=#ffffff;noLabel=1;" parent="1" vertex="1">
+                    <mxGeometry x="-610" y="20" width="700" height="300" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="erDiagram&#10;    CUSTOMER ||--o{ ORDER : places&#10;    ORDER ||--|{ LINE-ITEM : contains&#10;    CUSTOMER }|..|{ DELIVERY-ADDRESS : uses&#10;" style="shadow=0;dashed=0;align=left;strokeWidth=1;shape=mxgraph.mermaid.abstract.mermaid;labelBackgroundColor=#ffffff;noLabel=1;" parent="1" vertex="1">
+                    <mxGeometry x="-270" y="420" width="240" height="360" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

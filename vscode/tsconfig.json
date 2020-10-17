@@ -10,6 +10,7 @@
 		"allowJs": true
 	},
 	"files": [
+		"src/loader.d.ts",
 		"src/vscode_extension.ts",
 		"src/vscode-drawio/src/DrawioExtensionApi.ts"
 	]

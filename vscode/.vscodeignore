@@ -1,5 +1,5 @@
 **/*
 !package.json
-!dist
+!dist/vscode_extension.js
 !README.md
 !doc/logo.drawio.png

@@ -1,7 +1,6 @@
 import { ExtensionContext } from 'vscode';
 import { DrawioExtensionApi, DocumentContext } from './vscode-drawio/src/DrawioExtensionApi'
-import { readFile } from "fs";
-import { join } from "path";
+import drawio_plugin from 'raw-loader!./../../drawio_desktop/dist/mermaid-plugin.webpack.js';
 
 export function activate(context: ExtensionContext) {
 	let api: DrawioExtensionApi;
@@ -9,13 +8,7 @@ export function activate(context: ExtensionContext) {
 		drawioExtensionV1: {
 			getDrawioPlugins(context: DocumentContext) {
 				return new Promise((resolve, reject) => {
-					readFile(join(__dirname, "./mermaid-plugin.webpack.js"), "utf-8", (err:any, data:string) => {
-						if (err) {
-							reject();
-						} else {
-							resolve([{ jsCode: data}]);
-						}
-					});
+					resolve([{ jsCode: drawio_plugin}]);
 				})
 			}
 		}
