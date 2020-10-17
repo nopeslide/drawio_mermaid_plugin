@@ -10,4 +10,5 @@ updates:
     schedule:
       interval: "daily"
     allow:
+      - dependency-type: "all"
       - dependency-name: "mermaid"
