@@ -16,6 +16,10 @@ Mermaid supports:
 
 via a simple markup language
 
+## Installation
+* [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=nopeslide.vscode-drawio-plugin-mermaid)
+* Open VSX coming soon
+
 ## Overview
 
 * Example diagrams
