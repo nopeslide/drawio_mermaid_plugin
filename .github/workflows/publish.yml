@@ -1,0 +1,103 @@
+name: "Publish - Action"
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'version'     
+        required: true
+        default: '0.0.0'
+
+jobs:
+  worker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout branch
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+          fetch-depth: 0
+      - name: setup node.js
+        uses: actions/setup-node@v1
+
+      - name: install drawio_desktop dependencies
+        working-directory: drawio_desktop
+        run: npm install
+
+      - name: install vscode dependencies
+        working-directory: vscode
+        run: npm install
+
+      - name: set drawio_desktop version
+        working-directory: drawio_desktop
+        run: npm version ${{ github.event.inputs.version }}
+
+      - name: set vscode extension version
+        working-directory: vscode
+        run: npm version ${{ github.event.inputs.version }}
+
+      - name: build drawio_desktop
+        working-directory: drawio_desktop
+        run: npm run build
+
+      - name: set PLUGIN env
+        run: echo "PLUGIN=mermaid-plugin.webpack.js" >> $GITHUB_ENV
+
+      - name: set PLUGIN_PATH env
+        run: echo "PLUGIN_PATH=$(find . -name '${{ env.PLUGIN }}')" >> $GITHUB_ENV
+
+      - name: build vscode extension
+        working-directory: vscode
+        run: npm run vscode:package
+        
+      - name: set VSIX_PATH env
+        run: echo "VSIX_PATH=$(find . -name '*${{ github.event.inputs.version }}*.vsix')" >> $GITHUB_ENV
+
+      - name: set VSIX env
+        run: echo "VSIX=$(basename ${{ env.VSIX_PATH }})" >> $GITHUB_ENV
+
+      # - name: Publish to Open VSX Registry
+      #   uses: HaaLeo/publish-vscode-extension@v0
+      #   with:
+      #     pat: ${{ secrets.OPEN_VSX_TOKEN }}
+      #     extensionFile: ${{ env.VSIX_PATH }}
+      #     packagePath: ''
+
+      - name: Publish to Visual Studio Marketplace
+        uses: HaaLeo/publish-vscode-extension@v0
+        with:
+          pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
+          registryUrl: https://marketplace.visualstudio.com
+          extensionFile: ${{ env.VSIX_PATH }}
+          packagePath: ''
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          release_name: Release ${{ github.event.inputs.version }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset ${{ env.VSIX }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.VSIX_PATH }}
+          asset_name: ${{ env.VSIX }}
+          asset_content_type:  application/octet-stream 
+
+      - name: Upload Release Asset ${{ env.PLUGIN }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.PLUGIN_PATH }}
+          asset_name: ${{ env.PLUGIN }}
+          asset_content_type: application/octet-stream

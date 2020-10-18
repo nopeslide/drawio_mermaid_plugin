@@ -11,4 +11,9 @@ updates:
       interval: "daily"
     allow:
       - dependency-type: "all"
-      - dependency-name: "mermaid"
+  - package-ecosystem: "npm" # See documentation for possible values
+    directory: "/vscode" # Location of package manifests
+    schedule:
+      interval: "daily"
+    allow:
+      - dependency-type: "all"

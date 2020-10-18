@@ -2,7 +2,7 @@
 	"name": "vscode-drawio-plugin-mermaid",
 	"displayName": "Draw.io Integration: Mermaid plugin",
 	"description": "Mermaid plugin for Draw.io Integration",
-	"version": "0.0.4",
+	"version": "0.0.0",
 	"publisher": "nopeslide",
 	"repository": "https://github.com/nopeslide/drawio_mermaid_plugin",
 	"readme": "./README.md",
@@ -17,10 +17,11 @@
 	"main": "dist/vscode_extension.js",
 	"contributes": {},
 	"scripts": {
-		"vscode:prepublish": "npm run build:production",
-		"vscode:package":    "vsce package",
-		"build:production":  "webpack --mode production",
-		"build:development": "webpack --mode development"
+		"vscode:prepublish": "npm run build",
+		"vscode:package": "npm run build && vsce package",
+		"webpack": "webpack --mode production",
+		"dependencies": "cd ../drawio_desktop && npm run build",
+		"build": "npm run webpack"
 	},
 	"devDependencies": {
 		"@types/node": "^12.12.0",
