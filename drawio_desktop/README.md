@@ -49,6 +49,8 @@ via a simple markup language.
 11. click `Apply`
 12. confirm Dialog
 
-Draw.io copies the plugin into an internal directory, making updates impossible.
-To link the plugin with the repository run:
+__Draw.io copies the plugin into an internal directory, making updates impossible!__
+
+To link the plugin with the repository:
+
 13. run `ln -sfr ~/drawio_mermaid_plugin/drawio_desktop/dist/mermaid-plugin.webpack.js ~/.config/draw.io/plugins/`
