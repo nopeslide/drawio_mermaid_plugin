@@ -11,8 +11,9 @@
 		"build": "npm run webpack"
 	},
 	"devDependencies": {
+		"mermaid": "^8.8.1",
+		"raw-loader": "^4.0.2",
 		"webpack": "^5.1.3",
-		"webpack-cli": "^4.0.0",
-		"mermaid": "^8.8.1"
+		"webpack-cli": "^4.0.0"
 	}
 }
