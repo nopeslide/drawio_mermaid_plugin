@@ -48,5 +48,5 @@ via a simple markup language
 
 ## Draw.io desktop
 See
-[github](https://github.com/nopeslide/drawio_mermaid_plugin/drawio_desktop)
+[github](https://github.com/nopeslide/drawio_mermaid_plugin/tree/master/drawio_desktop)
 for the desktop variant of this plugin.
