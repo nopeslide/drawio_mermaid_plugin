@@ -18,7 +18,7 @@ via a simple markup language
 
 ## Installation
 * [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=nopeslide.vscode-drawio-plugin-mermaid)
-* Open VSX coming soon
+* [OpenVSX Marketplace](https://open-vsx.org/extension/nopeslide/vscode-drawio-plugin-mermaid)
 
 ## Overview
 
