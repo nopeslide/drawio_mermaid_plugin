@@ -33,7 +33,7 @@
 		"ts-loader": "^8.0.5",
 		"typescript": "^4.0.2",
 		"vsce": "^1.81.1",
-		"webpack": "^4.44.2",
+		"webpack": "^5.1.3",
 		"webpack-cli": "^4.0.0"
 	},
 	"isDrawioExtension": true
