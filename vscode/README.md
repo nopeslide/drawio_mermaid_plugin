@@ -39,9 +39,12 @@ via a simple markup language
 ## How to build
 
 1. `git clone --recursive https://github.com/nopeslide/drawio_mermaid_plugin.git`
-2. `cd drawio_mermaid_plugin/vscode`
+2. `cd drawio_mermaid_plugin/drawio_desktop`
 3. `npm install`
-4. `npm run vscode:package`
+4. `npm run build`
+5. `cd ../vscode`
+6. `npm install`
+7. `npm run vscode:package`
 
 ## Draw.io desktop
 See
