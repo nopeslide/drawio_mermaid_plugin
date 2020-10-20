@@ -316,8 +316,7 @@ mxShapeMermaid.prototype.updateImage = function (w, h) {
         this.image = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(this.mermaidOutput)));
         this.error = '';
     } catch (err) {
-        this.error = err.message;
-        console.log(err.message);
+        this.error = err.str;
     }
 }
 
