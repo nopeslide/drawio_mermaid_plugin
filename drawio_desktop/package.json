@@ -3,12 +3,15 @@
 	"displayName": "Draw.io: Mermaid plugin",
 	"description": "Mermaid plugin for Draw.io Desktop",
 	"version": "0.0.0",
+	"license": "GPL-3.0",
 	"publisher": "nopeslide",
 	"repository": "https://github.com/nopeslide/drawio_mermaid_plugin",
 	"readme": "./README.md",
 	"scripts": {
-		"webpack": "webpack --mode production",
-		"build": "npm run webpack"
+		"webpack:production": "webpack --mode production",
+		"webpack:development": "webpack --mode development",
+		"build": "npm run webpack:production",
+		"dev": "npm run webpack:development"
 	},
 	"devDependencies": {
 		"mermaid": "^8.8.1",
