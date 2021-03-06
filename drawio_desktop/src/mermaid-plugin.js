@@ -6,6 +6,7 @@ import mermaid from 'mermaid'
  * Constructs a new parse dialog.
  */
 var DialogMermaid = function (editorUi, shape) {
+
   var insertPoint = editorUi.editor.graph.getFreeInsertPoint();
 
   function parse(text, type, evt) {
@@ -25,27 +26,45 @@ var DialogMermaid = function (editorUi, shape) {
 
 
   var div = document.createElement('div');
-  div.style.textAlign = 'right';
+  div.style = "display: flex; flex-direction: column; padding: 16px; height: inherit;";
+  div.innerHTML = `
+     <div style="flex: 1; display: flex; flex-direction: row; overflow-y: auto">
+      <textarea id="plugin_mermaid_textarea" style="width: 40%; resize: horizontal;"></textarea>
+      <div id="plugin_mermaid_preview" style="flex: 1; text-align: center; overflow-y: auto"></div>
+     </div>
+     <div style="flex: 0 0 4em; display: flex; flex-direction: row; align-items: end">
+      <pre id="plugin_mermaid_parserstatus" style="flex: 1; text-align: left;  overflow-x: auto"></pre>
+      <div id="plugin_mermaid_buttons" style="flex: initial; text-align: right; align-self: flex-end;">
+      <p style="margin-block: unset;">
+        <a target="_blank" href="https://mermaid-js.github.io/mermaid/#/./n00b-syntaxReference">[ Syntax ]</a>
+      </p><br /></div>
+     </div>
+     <div style="flex: 0 0 32px;"></div>
+    `;
 
-  var textarea = document.createElement('textarea');
-  textarea.style.resize = 'none';
-  textarea.style.width = '100%';
-  textarea.style.height = '354px';
-  textarea.style.marginBottom = '16px';
-  textarea.value = shape.state.cell.value;
-  
-  div.appendChild(textarea);
-  
-  var parserStatus = document.createElement('pre');
-  parserStatus.style.height = '4em';
-  parserStatus.style.width  = '100%';
-  parserStatus.style.width  = '100%';
-  parserStatus.style.textAlign  = 'left';
-  div.appendChild(parserStatus);
+  var textarea = div.querySelector('#plugin_mermaid_textarea');
+  // textarea.value = shape.state.cell.value;
+  textarea.value = editorUi.editor.graph.convertValueToString(shape.state.cell); // Compatble with cell properties
 
-  this.init = function () {
-    textarea.focus();
-  };
+  
+  var parserStatus = div.querySelector('#plugin_mermaid_parserstatus');
+  var preview = div.querySelector('#plugin_mermaid_preview');
+  var buttons = div.querySelector('#plugin_mermaid_buttons');
+
+  var win_width = 800;
+  var win_height = 640;
+  if (editorUi.diagramContainer.clientWidth < win_width) win_width = editorUi.diagramContainer.clientWidth - 20;
+  if (editorUi.diagramContainer.clientHeight < win_height) win_height = editorUi.diagramContainer.clientHeight - 20;
+
+  var win = new mxWindow("Mermaid", div, 
+    (editorUi.diagramContainer.clientWidth - win_width) / 2 + editorUi.diagramContainer.offsetLeft, 
+    (editorUi.diagramContainer.clientHeight - win_height) / 2 + editorUi.diagramContainer.offsetTop, 
+    win_width, 
+    win_height, 
+    true, true);
+  win.setResizable(true);
+  win.setMaximizable(true);
+  win.setClosable(true);
 
   // Enables dropping files
   if (Graph.fileSupport) {
@@ -71,6 +90,17 @@ var DialogMermaid = function (editorUi, shape) {
       try {
         mermaid.parse(textarea.value);
         parserStatus.innerHTML = 'no error detected';
+
+        // Display preview
+        let insertSvg = function (svgCode, bindFunctions) { 
+          preview.innerHTML = svgCode;   /* bindFunctions(preview); */ 
+          preview.querySelector('#graph-div').style.height = 'inherit';
+        };
+        var code = textarea.value;
+        preview.innerHTML  = code.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        mermaid.init(shape.getRenderOptions() , preview);
+        if (code) mermaid.render('graph-div', code, insertSvg);
+
       } catch (e) {
         parserStatus.innerHTML = e.str;
       }
@@ -90,28 +120,30 @@ var DialogMermaid = function (editorUi, shape) {
   }
 
   var cancelBtn = mxUtils.button(mxResources.get('close'), function () {
-    editorUi.hideDialog();
+    win.destroy();
   });
 
   cancelBtn.className = 'geBtn';
 
   if (editorUi.editor.cancelFirst) {
-    div.appendChild(cancelBtn);
+    buttons.appendChild(cancelBtn);
   }
 
   var okBtn = mxUtils.button(mxResources.get('apply'), function (evt) {
-    editorUi.hideDialog();
     parse(textarea.value, evt);
+    win.destroy();
   });
-  div.appendChild(okBtn);
+  buttons.appendChild(okBtn);
 
   okBtn.className = 'geBtn gePrimaryBtn';
 
   if (!editorUi.editor.cancelFirst) {
-    div.appendChild(cancelBtn);
+    buttons.appendChild(cancelBtn);
   }
 
-  this.container = div;
+  win.show();
+  textarea.focus();
+
 };
 
 Draw.loadPlugin(function (ui) {
@@ -131,8 +163,6 @@ Draw.loadPlugin(function (ui) {
 
     if (shape) {
       var dlg = new DialogMermaid(ui,shape);
-      ui.showDialog(dlg.container,800,500, true, false);
-      dlg.init();
     }
     evt.consume();
   });

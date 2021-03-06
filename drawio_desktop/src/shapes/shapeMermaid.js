@@ -312,7 +312,9 @@ mxShapeMermaid.prototype.updateImage = function (w, h) {
             this.getRenderOptions()
         );
 
-        mermaid.mermaidAPI.render('mermaid-' + this.state.cell.id, this.state.cell.value, (svg) => { this.mermaidOutput = svg; }, container);
+        mermaid.mermaidAPI.render('mermaid-' + this.state.cell.id, 
+            this.state.view.graph.convertValueToString(this.state.cell), 
+            (svg) => { this.mermaidOutput = svg; }, container);
         this.image = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(this.mermaidOutput)));
         this.error = '';
     } catch (err) {
