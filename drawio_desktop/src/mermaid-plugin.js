@@ -1,4 +1,4 @@
-import "./shapes/shapeMermaid";
+import { mermaid_plugin_defaults, isObject, mergeDeep, diffDeep, mxShapeMermaid } from "./shapes/shapeMermaid";
 import "./palettes/mermaid/paletteMermaid";
 import mermaid from 'mermaid'
 
@@ -14,6 +14,9 @@ var DialogMermaid = function (editorUi, shape) {
         var graph = editorUi.editor.graph;
         graph.getModel().beginUpdate();
         graph.labelChanged(shape.state.cell,text);
+        // To replace valueChanged in mxShapeMermaid.prototype.paintVertexShape
+        shape.updateImage(); 
+        shape.redraw();
         graph.getModel().endUpdate();
         editorUi.spinner.stop();
   
@@ -35,8 +38,11 @@ var DialogMermaid = function (editorUi, shape) {
      <div style="flex: 0 0 4em; display: flex; flex-direction: row; align-items: end">
       <pre id="plugin_mermaid_parserstatus" style="flex: 1; text-align: left;  overflow-x: auto"></pre>
       <div id="plugin_mermaid_buttons" style="flex: initial; text-align: right; align-self: flex-end;">
-      <p style="margin-block: unset;">
-        <a target="_blank" href="https://mermaid-js.github.io/mermaid/#/./n00b-syntaxReference">[ Syntax ]</a>
+      <p style="margin-block: unset;">|
+        <a id="plugin_mermaid_button_html" href="#">HTML</a> | 
+        <!-- <a id="plugin_mermaid_button_svg" href="#">SVG</a> |  -->
+        <a id="plugin_mermaid_button_png" href="#">PNG</a> | 
+        <a target="_blank" href="https://mermaid-js.github.io/mermaid/#/./n00b-syntaxReference">Syntax</a> |
       </p><br /></div>
      </div>
      <div style="flex: 0 0 32px;"></div>
@@ -119,6 +125,52 @@ var DialogMermaid = function (editorUi, shape) {
     textarea.addEventListener('input', handleInput, false);
   }
 
+  // Handle copy
+  
+  div.querySelector('#plugin_mermaid_button_png').onclick = async function() {
+      var clipboard = navigator.clipboard;
+      var svg = div.querySelector('#graph-div');
+
+      // https://stackoverflow.com/questions/60551658/saving-offscreencanvas-content-to-disk-as-png-in-electron
+      // https://stackoverflow.com/questions/32230894/convert-very-large-svg-to-png-using-canvas
+      var svg_xml = (new XMLSerializer()).serializeToString(svg);
+      var blob = new Blob([svg_xml], {type:'image/svg+xml;charset=utf-8'});
+      var url = window.URL.createObjectURL(blob);
+  
+      var scale = 3;
+      var img = new Image();
+      img.width = svg.getBBox().width * scale ;
+      img.height = svg.getBBox().height * scale ;
+      img.onload = () => {
+          var canvas = document.createElement('canvas');
+          var context = canvas.getContext('2d');
+          canvas.width = svg.getBBox().width * scale;
+          canvas.height = svg.getBBox().height * scale;
+          context.drawImage(img, svg.getBBox().x * scale, svg.getBBox().y * scale, svg.getBBox().width * scale, svg.getBBox().height * scale);
+          window.URL.revokeObjectURL(url);
+          canvas.toBlob(function(imgBlob) {
+             clipboard.write( [ new ClipboardItem({[imgBlob.type]: imgBlob }) ] );
+          }, 'image/png');
+      }
+      img.src = url;
+  }
+
+  /*
+  div.querySelector('#plugin_mermaid_button_svg').onclick = async function() {
+    var svg_xml = (new XMLSerializer()).serializeToString(div.querySelector('#graph-div'));
+    var svg_blob = new Blob([svg_xml], {type : 'image/svg+xml;charset=utf-8'});
+    var clip_item = new ClipboardItem( {'image/svg+xml': svg_blob } );
+    navigator.clipboard.write( [ clip_item  ] );
+  }
+  */
+  
+  div.querySelector('#plugin_mermaid_button_html').onclick = async function() {
+    navigator.clipboard.write( [ new ClipboardItem(
+      { 'text/html' : new Blob(["<img src='" + "data:image/svg+xml;base64," + 
+        btoa(unescape(encodeURIComponent(div.querySelector('#graph-div').outerHTML))) + "'>"], {type : 'text/html'}) }) ]
+    );
+  }
+
   var cancelBtn = mxUtils.button(mxResources.get('close'), function () {
     win.destroy();
   });
@@ -147,23 +199,160 @@ var DialogMermaid = function (editorUi, shape) {
 };
 
 Draw.loadPlugin(function (ui) {
+
+  // Build mermaid settings : by least order
+  // - mermaid_plugin_defaults : this plugin defaults
+  // - EditorUi.defaultMermaidConfig : drawio defaults mermaid
+  // - Editor.config.defaultMermaidConfig : drawio config (from PreConfig and local configuration)
+
+  let mermaid_settings = {};
+  mermaid_settings = mergeDeep(mermaid_settings, mermaid_plugin_defaults);
+  mermaid_settings = mergeDeep(mermaid_settings, window.EditorUi.defaultMermaidConfig);
+  mermaid_settings = mergeDeep(mermaid_settings, window.Editor.config.defaultMermaidConfig);
+
+  // Result is updated back in EditorUi.defaultMermaidConfig to have consistent settings with native mermaid
+  // Note that the result will not be consistent if the diagram is updated in native mermaid without the plugin, 
+  // but no solution would be perfect until native mermaid allow some configuration...
+  // As mermaid version are not the same between native mermaid and the plugin one, render may be different.
+  window.EditorUi.defaultMermaidConfig = mermaid_settings;
+
+  // Handle defaults
+  Object.assign(mermaid_plugin_defaults, mermaid_settings);
+  mxShapeMermaid.prototype.customProperties = mxShapeMermaid.prototype.buildCustomProperties(mermaid_settings);
+
   // Adds custom sidebar entry
   ui.sidebar.addMermaidPalette();
 
-  ui.editor.graph.addListener(mxEvent.DOUBLE_CLICK, function (sender, evt) {
-    var cell = evt.getProperty("cell");
+  function isCellPluginMermaid(cell) {
     if (!cell) {
-      return;
+      return false;
     }
     if (cell.style.indexOf("shape=mxgraph.mermaid.abstract.mermaid") < 0) {
-      return;
+      return false;
     }
+    return true;
+  }
 
-    var shape = ui.editor.graph.view.states["map"][cell.mxObjectId].shape;
-
-    if (shape) {
-      var dlg = new DialogMermaid(ui,shape);
+  function isCellNativeMermaid(cell) {
+    if (!cell) { return false; }
+    if (mxUtils.isNode(cell.value)) {
+      if (cell.getAttribute('mermaidData', '') != '') {
+        return true;
+      }
     }
-    evt.consume();
+    return false;
+  }
+
+  ui.editor.graph.addListener(mxEvent.DOUBLE_CLICK, function (sender, evt) {
+    var cell = evt.getProperty("cell");
+    if (isCellPluginMermaid(cell)) {
+      var shape = ui.editor.graph.view.states["map"][cell.mxObjectId].shape;
+
+      if (shape) {
+        var dlg = new DialogMermaid(ui,shape);
+      }
+      evt.consume();
+    }
   });
+
+  // Add convert menus
+	mxResources.parse('mermaidconvertfrom=Convert to Mermaid plugin shape...');
+	mxResources.parse('mermaidconvertto=Convert to native Mermaid shape...');
+
+  var uiCreatePopupMenu = ui.menus.createPopupMenu;
+	ui.menus.createPopupMenu = function(menu, cell, evt)
+	{
+		uiCreatePopupMenu.apply(this, arguments);
+		
+		var graph = ui.editor.graph;
+    var cell = graph.getSelectionCell();
+		
+		if (isCellPluginMermaid(cell)) {
+			this.addMenuItems(menu, ['-', 'mermaidconvertto'], null, evt);
+		}
+
+		if (isCellNativeMermaid(cell)) {
+			this.addMenuItems(menu, ['-', 'mermaidconvertfrom'], null, evt);
+		}
+
+	};
+
+	ui.actions.addAction('mermaidconvertto', function()
+	{
+		let graph =ui.editor.graph ;
+    let cell = graph.getSelectionCell();
+    if (!isCellPluginMermaid(cell)) return;
+
+    graph.getModel().beginUpdate();
+    try
+    {
+      let state = graph.view.getState(cell, true);
+      let mermaidData = JSON.stringify({data: graph.convertValueToString(cell), config: state.shape.getRenderOptions() /*getStyleOptions()*/}, null, 2)
+      state.shape.redraw();
+      let image = state.shape.image.replace(";base64",""); // ;base64 breaks the style
+      graph.setCellStyle('shape=image;noLabel=1;verticalAlign=top;imageAspect=1;' + 'image=' + image + ';', [cell]);
+      graph.setAttributeForCell(cell, 'mermaidData', mermaidData );
+      
+      graph.view.getState(cell, true).destroy();
+      graph.view.getState(cell, true);
+    }
+    finally
+    {
+      graph.getModel().endUpdate();
+    }
+
+	});
+
+
+	ui.actions.addAction('mermaidconvertfrom', function()
+	{
+    let graph = ui.editor.graph;
+		let cell = graph.getSelectionCell();
+    if (!isCellNativeMermaid(cell)) return;
+
+    var data = JSON.parse(cell.getAttribute('mermaidData', ''));
+
+    graph.getModel().beginUpdate();
+		try	{
+      // Default style from paletteMermaid
+      let style = 'shadow=0;dashed=0;align=left;strokeWidth=1;shape=mxgraph.mermaid.abstract.mermaid;labelBackgroundColor=#ffffff;noLabel=1;';
+
+      function addToStyle(basestyle, value) {
+        if (isObject(value)) {
+          for(let key in value) {
+            addToStyle( (basestyle == '') ? key : basestyle + "_" + key ,  value[key] );
+          }
+        } else {
+          style += encodeURI(basestyle) + "=" + encodeURI(value) + ";";
+        }
+      }      
+
+      let configDiff = diffDeep(data.config, mermaid_plugin_defaults);
+      addToStyle('', configDiff);
+
+      // cell.value = data.data;
+      graph.setAttributeForCell(cell, 'mermaidData', "" );
+      graph.labelChanged(cell,data.data);
+
+
+      graph.setCellStyle(style, [cell]);
+
+      graph.view.getState(cell, true).destroy();
+      graph.view.getState(cell, true);
+    }
+    finally
+    {
+      graph.getModel().endUpdate();
+    }
+
+	});
+
+
+
+
+
 });
+
+
+
+
