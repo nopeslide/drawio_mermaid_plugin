@@ -38,10 +38,15 @@ var DialogMermaid = function (editorUi, shape) {
      <div style="flex: 0 0 4em; display: flex; flex-direction: row; align-items: end">
       <pre id="plugin_mermaid_parserstatus" style="flex: 1; text-align: left;  overflow-x: auto"></pre>
       <div id="plugin_mermaid_buttons" style="flex: initial; text-align: right; align-self: flex-end;">
-      <p style="margin-block: unset;">|
-        <a id="plugin_mermaid_button_html" href="#">HTML</a> | 
-        <!-- <a id="plugin_mermaid_button_svg" href="#">SVG</a> |  -->
+      <p style="margin-block: unset; font-size: 90%"> 
+        <br />Download as |
+        <a id="plugin_mermaid_button_dl_svg" href="#">SVG</a> |
+        <a id="plugin_mermaid_button_dl_png" href="#">PNG</a> | 
+        <br />Copy as |
+        <span style="display: none;"><a id="plugin_mermaid_button_html" href="#">HTML</a> | </span>
+        <span style="display: none;"><a id="plugin_mermaid_button_svg" href="#">SVG</a> |  </span>
         <a id="plugin_mermaid_button_png" href="#">PNG</a> | 
+        <br />Help | 
         <a target="_blank" href="https://mermaid-js.github.io/mermaid/#/./n00b-syntaxReference">Syntax</a> |
       </p><br /></div>
      </div>
@@ -126,48 +131,76 @@ var DialogMermaid = function (editorUi, shape) {
   }
 
   // Handle copy
-  
-  div.querySelector('#plugin_mermaid_button_png').onclick = async function() {
-      var clipboard = navigator.clipboard;
-      var svg = div.querySelector('#graph-div');
+  function generateCanvas(callback, background=null) {
+    var svg = div.querySelector('#graph-div');
 
-      // https://stackoverflow.com/questions/60551658/saving-offscreencanvas-content-to-disk-as-png-in-electron
-      // https://stackoverflow.com/questions/32230894/convert-very-large-svg-to-png-using-canvas
-      var svg_xml = (new XMLSerializer()).serializeToString(svg);
-      var blob = new Blob([svg_xml], {type:'image/svg+xml;charset=utf-8'});
-      var url = window.URL.createObjectURL(blob);
-  
-      var scale = 3;
-      var img = new Image();
-      img.width = svg.getBBox().width * scale ;
-      img.height = svg.getBBox().height * scale ;
-      img.onload = () => {
-          var canvas = document.createElement('canvas');
-          var context = canvas.getContext('2d');
-          canvas.width = svg.getBBox().width * scale;
-          canvas.height = svg.getBBox().height * scale;
-          context.drawImage(img, svg.getBBox().x * scale, svg.getBBox().y * scale, svg.getBBox().width * scale, svg.getBBox().height * scale);
-          window.URL.revokeObjectURL(url);
-          canvas.toBlob(function(imgBlob) {
-             clipboard.write( [ new ClipboardItem({[imgBlob.type]: imgBlob }) ] );
-          }, 'image/png');
-      }
-      img.src = url;
+    // https://stackoverflow.com/questions/60551658/saving-offscreencanvas-content-to-disk-as-png-in-electron
+    // https://stackoverflow.com/questions/32230894/convert-very-large-svg-to-png-using-canvas
+    var svg_xml = (new XMLSerializer()).serializeToString(svg);
+    var blob = new Blob([svg_xml], {type:'image/svg+xml;charset=utf-8'});
+    var url = window.URL.createObjectURL(blob);
+
+    var scale = 3;
+    var img = new Image();
+    img.width = svg.getBBox().width * scale ;
+    img.height = svg.getBBox().height * scale ;
+    img.onload = () => {
+        var canvas = document.createElement('canvas');
+        var context = canvas.getContext('2d');
+        canvas.width = svg.getBBox().width * scale;
+        canvas.height = svg.getBBox().height * scale;
+
+        // Add a white background to cope with the transparent image problem getting black on windows...
+        if (background) {
+          context.fillStyle = background;
+          context.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        context.drawImage(img, svg.getBBox().x * scale, svg.getBBox().y * scale, svg.getBBox().width * scale, svg.getBBox().height * scale);
+        window.URL.revokeObjectURL(url);
+
+        callback(canvas);
+    }
+    img.src = url;  
   }
 
-  /*
+  div.querySelector('#plugin_mermaid_button_dl_svg').onclick = async function() {
+    var aDownloadLink = document.createElement('a');
+    aDownloadLink.download = 'image.svg';
+    aDownloadLink.href = "data:image/svg+xml;base64," +  btoa(unescape(encodeURIComponent(div.querySelector('#graph-div').outerHTML)));
+    aDownloadLink.click();
+  }
+  
+  div.querySelector('#plugin_mermaid_button_dl_png').onclick = async function() {
+    generateCanvas(function(canvas) {
+      var aDownloadLink = document.createElement('a');
+      aDownloadLink.download = 'image.png';
+      aDownloadLink.href = canvas.toDataURL();
+      aDownloadLink.click();
+    });
+  }
+  
+  div.querySelector('#plugin_mermaid_button_png').onclick = async function() {
+      generateCanvas(function(canvas) {
+        canvas.toBlob(function(imgBlob) {
+          navigator.clipboard.write( [ new ClipboardItem({[imgBlob.type]: imgBlob }) ] );
+        }, 'image/png');
+      }, 'white');
+  }
+
+  // (hidden) Buggy - Oddly makes the whole electron stop working... 
   div.querySelector('#plugin_mermaid_button_svg').onclick = async function() {
     var svg_xml = (new XMLSerializer()).serializeToString(div.querySelector('#graph-div'));
     var svg_blob = new Blob([svg_xml], {type : 'image/svg+xml;charset=utf-8'});
     var clip_item = new ClipboardItem( {'image/svg+xml': svg_blob } );
     navigator.clipboard.write( [ clip_item  ] );
   }
-  */
   
+  // (hidden) Tested, but not very usefull as not much destination applications support it... (Libreoffice Writer, with poor SVG render) 
   div.querySelector('#plugin_mermaid_button_html').onclick = async function() {
     navigator.clipboard.write( [ new ClipboardItem(
       { 'text/html' : new Blob(["<img src='" + "data:image/svg+xml;base64," + 
-        btoa(unescape(encodeURIComponent(div.querySelector('#graph-div').outerHTML))) + "'>"], {type : 'text/html'}) }) ]
+            btoa(unescape(encodeURIComponent(div.querySelector('#graph-div').outerHTML))) + "'>"], {type : 'text/html'}) }) ]
     );
   }
 
