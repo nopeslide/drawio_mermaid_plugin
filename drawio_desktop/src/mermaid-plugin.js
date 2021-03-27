@@ -136,9 +136,10 @@ var DialogMermaid = function (editorUi, shape) {
 
     // https://stackoverflow.com/questions/60551658/saving-offscreencanvas-content-to-disk-as-png-in-electron
     // https://stackoverflow.com/questions/32230894/convert-very-large-svg-to-png-using-canvas
-    var svg_xml = (new XMLSerializer()).serializeToString(svg);
-    var blob = new Blob([svg_xml], {type:'image/svg+xml;charset=utf-8'});
-    var url = window.URL.createObjectURL(blob);
+    //var svg_xml = (new XMLSerializer()).serializeToString(svg);
+    //var blob = new Blob([svg_xml], {type:'image/svg+xml;charset=utf-8'});
+    //var url = window.URL.createObjectURL(blob);
+    var url = "data:image/svg+xml;base64," +  btoa(unescape(encodeURIComponent(div.querySelector('#graph-div').outerHTML)));
 
     var scale = 3;
     var img = new Image();
