@@ -241,8 +241,20 @@ Draw.loadPlugin(function (ui) {
 
   let mermaid_settings = {};
   mermaid_settings = mergeDeep(mermaid_settings, mermaid_plugin_defaults);
-  mermaid_settings = mergeDeep(mermaid_settings, window.EditorUi.defaultMermaidConfig);
-  mermaid_settings = mergeDeep(mermaid_settings, window.Editor.config.defaultMermaidConfig);
+  try {
+    mermaid_settings = mergeDeep(mermaid_settings, window.EditorUi.defaultMermaidConfig);
+  } catch (e) {
+    if (!e instanceof TypeError) {
+      throw e;
+    }
+  }
+  try {
+    mermaid_settings = mergeDeep(mermaid_settings, window.Editor.config.defaultMermaidConfig);
+  } catch (e) {
+    if (!e instanceof TypeError) {
+      throw e;
+    }
+  }
 
   // Result is updated back in EditorUi.defaultMermaidConfig to have consistent settings with native mermaid
   // Note that the result will not be consistent if the diagram is updated in native mermaid without the plugin, 
@@ -386,7 +398,6 @@ Draw.loadPlugin(function (ui) {
 
 
 });
-
 
 
 
