@@ -11,9 +11,7 @@
 		"webpack:production": "webpack --mode production",
 		"webpack:development": "webpack --mode development",
 		"build": "npm run webpack:production",
-		"dev": "npm run webpack:development",
-		"dev-win": "set DRAWIO_ENV=dev&& npm run dev && copy /Y dist\\mermaid-plugin.webpack.js %AppData%\\draw.io\\plugins && cd ..\\..\\drawio\\src\\main\\webapp && .\\node_modules\\.bin\\electron .",
-		"release-win": "set DRAWIO_ENV=dev&& npm run build && copy /Y dist\\mermaid-plugin.webpack.js %AppData%\\draw.io\\plugins && cd ..\\..\\drawio\\src\\main\\webapp && .\\node_modules\\.bin\\electron ."
+		"dev": "npm run webpack:development"
 	},
 	"devDependencies": {
 		"mermaid": "^8.9.1",
