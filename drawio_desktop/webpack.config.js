@@ -6,5 +6,8 @@ module.exports = {
     filename: 'mermaid-plugin.webpack.js',
     path: path.resolve(__dirname, 'dist'),
   },
-  devtool: 'source-map'
+  devtool: 'source-map',
+  externalsPresets: {
+    'electron': true,
+  },
 };

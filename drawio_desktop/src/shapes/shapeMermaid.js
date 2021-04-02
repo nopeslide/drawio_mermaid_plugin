@@ -1,4 +1,5 @@
 import mermaid from 'mermaid'
+import merge from 'deepmerge'
 
 export const mermaid_plugin_defaults_original = {
     startOnLoad: false,
@@ -116,57 +117,7 @@ export const mermaid_plugin_defaults_original = {
     }
 };
 
-// From https://stackoverflow.com/questions/27936772/how-to-deep-merge-instead-of-shallow-merge/34749873#34749873
-export function isObject(item) {
-    return (item && typeof item === 'object' && !Array.isArray(item));
-  }
-  
-export function mergeDeep(target, source) {
-    let output = Object.assign({}, target);
-    if (isObject(target) && isObject(source)) {
-      Object.keys(source).forEach(key => {
-        if (isObject(source[key])) {
-          if (!(key in target))
-            Object.assign(output, { [key]: source[key] });
-          else
-            output[key] = mergeDeep(target[key], source[key]);
-        } else {
-          Object.assign(output, { [key]: source[key] });
-        }
-      });
-    }
-    return output;
-  }
-// ---
-
-// Adapted from https://stackoverflow.com/questions/8572826/generic-deep-diff-between-two-objects
-export function diffDeep(target, source) {
-    let diff = Object.keys(target).reduce((diff, key) => {
-        // If object, deep
-        if (isObject(target[key]) && (key in source)) {
-            let diffkey = diffDeep(target[key], source[key]);
-            if (Object.keys(diffkey).length == 0)  { 
-                return diff
-            } else {
-                return {
-                    ...diff,
-                    [key]: diffkey
-                  }
-            }
-        }
-        // If identical ignore
-        if ((key in source) && (target[key] === source[key])) return diff
-        // If different, add value to the result
-        return {
-          ...diff,
-          [key]: target[key]
-        }
-      }, {})
-    return diff;
-}
-// ---
-
-export var mermaid_plugin_defaults = mergeDeep({}, mermaid_plugin_defaults_original);
+export var mermaid_plugin_defaults = merge({}, mermaid_plugin_defaults_original);
 
 /**
 * Extends mxShape.
@@ -370,7 +321,7 @@ mxShapeMermaid.prototype.getStyleOptions = function () {
 }
 
 mxShapeMermaid.prototype.getRenderOptions = function () {
-    return mergeDeep(this.defaults, this.getStyleOptions());
+    return merge(this.defaults, this.getStyleOptions());
 }
 
 mxShapeMermaid.prototype.updateImage = function (w, h) {

@@ -1,6 +1,10 @@
-import { mermaid_plugin_defaults, isObject, mergeDeep, diffDeep, mxShapeMermaid } from "./shapes/shapeMermaid";
+import { mermaid_plugin_defaults,  mxShapeMermaid } from "./shapes/shapeMermaid";
 import "./palettes/mermaid/paletteMermaid";
 import mermaid from 'mermaid'
+
+import merge from 'deepmerge'
+import { diff, addedDiff, deletedDiff, updatedDiff, detailedDiff } from 'deep-object-diff'
+import isObject from 'is-object'
 
 /**
  * Constructs a new parse dialog.
@@ -240,9 +244,9 @@ Draw.loadPlugin(function (ui) {
   // - Editor.config.defaultMermaidConfig : drawio config (from PreConfig and local configuration)
 
   let mermaid_settings = {};
-  mermaid_settings = mergeDeep(mermaid_settings, mermaid_plugin_defaults);
-  mermaid_settings = mergeDeep(mermaid_settings, window.EditorUi.defaultMermaidConfig);
-  mermaid_settings = mergeDeep(mermaid_settings, window.Editor.config.defaultMermaidConfig);
+  mermaid_settings = merge(mermaid_settings, mermaid_plugin_defaults);
+  mermaid_settings = merge(mermaid_settings, window.EditorUi.defaultMermaidConfig);
+  mermaid_settings = merge(mermaid_settings, window.Editor.config.defaultMermaidConfig);
 
   // Result is updated back in EditorUi.defaultMermaidConfig to have consistent settings with native mermaid
   // Note that the result will not be consistent if the diagram is updated in native mermaid without the plugin, 
@@ -344,10 +348,11 @@ Draw.loadPlugin(function (ui) {
 		let cell = graph.getSelectionCell();
     if (!isCellNativeMermaid(cell)) return;
 
-    var data = JSON.parse(cell.getAttribute('mermaidData', ''));
-
-    graph.getModel().beginUpdate();
 		try	{
+
+      var data = JSON.parse(cell.getAttribute('mermaidData', ''));
+
+      graph.getModel().beginUpdate();
       // Default style from paletteMermaid
       let style = 'shadow=0;dashed=0;align=left;strokeWidth=1;shape=mxgraph.mermaid.abstract.mermaid;labelBackgroundColor=#ffffff;noLabel=1;';
 
@@ -359,9 +364,9 @@ Draw.loadPlugin(function (ui) {
         } else {
           style += encodeURI(basestyle) + "=" + encodeURI(value) + ";";
         }
-      }      
+      }  
 
-      let configDiff = diffDeep(data.config, mermaid_plugin_defaults);
+      let configDiff = diff(mermaid_plugin_defaults, data.config);
       addToStyle('', configDiff);
 
       // cell.value = data.data;
@@ -373,8 +378,13 @@ Draw.loadPlugin(function (ui) {
 
       graph.view.getState(cell, true).destroy();
       graph.view.getState(cell, true);
-    }
-    finally
+
+    } 
+    catch (error) 
+    {
+      console.error(error);
+    } 
+    finally 
     {
       graph.getModel().endUpdate();
     }
