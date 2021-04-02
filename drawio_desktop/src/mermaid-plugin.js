@@ -362,9 +362,10 @@ Draw.loadPlugin(function (ui) {
 
 		try	{
 
+      graph.getModel().beginUpdate();
+
       var data = JSON.parse(cell.getAttribute('mermaidData', ''));
 
-      graph.getModel().beginUpdate();
       // Default style from paletteMermaid
       let style = 'shadow=0;dashed=0;align=left;strokeWidth=1;shape=mxgraph.mermaid.abstract.mermaid;labelBackgroundColor=#ffffff;noLabel=1;';
 
@@ -384,7 +385,6 @@ Draw.loadPlugin(function (ui) {
       // cell.value = data.data;
       graph.setAttributeForCell(cell, 'mermaidData', "" );
       graph.labelChanged(cell,data.data);
-
 
       graph.setCellStyle(style, [cell]);
 
