@@ -32,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -->
 
 [0.1.5]: https://github.com/nopeslide/drawio_mermaid_plugin/compare/v0.1.4...v0.1.5
-## [0.1.5] - 2021-04-02
+## [0.1.5] - 2021-10-23
 
 ### Changed
 - updated mermaid and dependencies
