@@ -48,7 +48,7 @@ jobs:
 
       - name: build vscode extension
         working-directory: vscode
-        run: npm run vscode:package
+        run: yes | npm run vscode:package
         
       - name: set VSIX_PATH env
         run: echo "VSIX_PATH=$(find . -name '*${{ github.event.inputs.version }}*.vsix')" >> $GITHUB_ENV
