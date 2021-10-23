@@ -22,7 +22,8 @@
 		"vscode:package": "npm run build && vsce package",
 		"webpack": "webpack --mode production",
 		"dependencies": "cd ../drawio_desktop && npm run build",
-		"build": "npm run webpack"
+		"build": "npm run webpack",
+		"publish": "vsce publish"
 	},
 	"devDependencies": {
 		"@types/node": "^16.11.4",

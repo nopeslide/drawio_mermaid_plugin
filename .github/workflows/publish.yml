@@ -64,12 +64,10 @@ jobs:
       #     packagePath: ''
 
       - name: Publish to Visual Studio Marketplace
-        uses: HaaLeo/publish-vscode-extension@v0
-        with:
-          pat: ${{ secrets.VS_MARKETPLACE_TOKEN }}
-          registryUrl: https://marketplace.visualstudio.com
-          extensionFile: ${{ env.VSIX_PATH }}
-          packagePath: ''
+        working-directory: vscode
+        run: yes | npm run publish
+        env:
+          VSCE_PAT: ${{ secrets.VS_MARKETPLACE_TOKEN }}
 
       - name: Create Release
         id: create_release
