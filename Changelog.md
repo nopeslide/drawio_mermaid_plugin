@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- EDIT THIS -->
-[Unreleased]: https://github.com/nopeslide/drawio_mermaid_plugin/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/nopeslide/drawio_mermaid_plugin/compare/v0.1.5...HEAD
 ## [Unreleased]
 
 <!--
@@ -31,8 +31,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - vulnerabilities.
 -->
 
+[0.1.5]: https://github.com/nopeslide/drawio_mermaid_plugin/compare/v0.1.4...v0.1.5
+## [0.1.5] - 2021-04-02
+
+### Changed
+- updated mermaid and dependencies
+
+[0.1.4]: https://github.com/nopeslide/drawio_mermaid_plugin/compare/v0.1.3...v0.1.4
+## [0.1.4] - 2021-04-02
+
+### Added
+- Convert from & to native mermaid objects
+
+### Changed
+- minor patches
+
+
 [0.1.3]: https://github.com/nopeslide/drawio_mermaid_plugin/compare/v0.1.2...v0.1.3
-## [0.1.2] - 2021-03-07
+## [0.1.3] - 2021-03-07
 
 ### Added
 - preview in dialog while editing
