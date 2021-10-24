@@ -1,11 +1,10 @@
 name: "Publish - Action"
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'version'     
-        required: true
-        default: '0.0.0'
+  push:
+    branches:
+      - '*'
+    tags:
+      - 'v*'
 
 jobs:
   worker:
@@ -18,8 +17,10 @@ jobs:
           submodules: true
           fetch-depth: 0
       - name: setup node.js
-        uses: actions/setup-node@v1
-
+        uses: actions/setup-node@v2
+        with:
+          check-latest: true
+        
       - name: install drawio_desktop dependencies
         working-directory: drawio_desktop
         run: npm install
@@ -30,11 +31,11 @@ jobs:
 
       - name: set drawio_desktop version
         working-directory: drawio_desktop
-        run: npm version ${{ github.event.inputs.version }}
+        run: npm version ${{ github.event.release.tag_name }}
 
       - name: set vscode extension version
         working-directory: vscode
-        run: npm version ${{ github.event.inputs.version }}
+        run: npm version ${{ github.event.release.tag_name }}
 
       - name: build drawio_desktop
         working-directory: drawio_desktop
@@ -51,10 +52,22 @@ jobs:
         run: yes | npm run vscode:package
         
       - name: set VSIX_PATH env
-        run: echo "VSIX_PATH=$(find . -name '*${{ github.event.inputs.version }}*.vsix')" >> $GITHUB_ENV
+        run: echo "VSIX_PATH=$(find . -name '*${{ github.event.release.tag_name }}*.vsix')" >> $GITHUB_ENV
 
       - name: set VSIX env
         run: echo "VSIX=$(basename ${{ env.VSIX_PATH }})" >> $GITHUB_ENV
+
+      - name: Upload drawio-desktop plugin Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PLUGIN }}
+          path: ${{ env.PLUGIN_PATH }}
+
+      - name: Upload vscode plugin Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.VSIX }}
+          path: ${{ env.VSIX_PATH }}
 
       # - name: Publish to Open VSX Registry
       #   uses: HaaLeo/publish-vscode-extension@v0
@@ -64,23 +77,26 @@ jobs:
       #     packagePath: ''
 
       - name: Publish to Visual Studio Marketplace
+        if: startsWith(github.ref, '/refs/tags/v')
         working-directory: vscode
         run: yes | npm run publish
         env:
           VSCE_PAT: ${{ secrets.VS_MARKETPLACE_TOKEN }}
 
       - name: Create Release
+        if: startsWith(github.ref, '/refs/tags/v')
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ github.event.inputs.version }}
-          release_name: Release ${{ github.event.inputs.version }}
+          tag_name: ${{ github.event.release.tag_name }}
+          release_name: Release ${{ github.event.release.tag_name }}
           draft: false
           prerelease: false
 
       - name: Upload Release Asset ${{ env.VSIX }}
+        if: startsWith(github.ref, '/refs/tags/v')
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -91,6 +107,7 @@ jobs:
           asset_content_type:  application/octet-stream 
 
       - name: Upload Release Asset ${{ env.PLUGIN }}
+        if: startsWith(github.ref, '/refs/tags/v')
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
