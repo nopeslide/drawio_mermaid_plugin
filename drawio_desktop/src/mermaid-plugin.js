@@ -210,7 +210,14 @@ var DialogMermaid = function (editorUi, shape) {
   }
 
   var cancelBtn = mxUtils.button(mxResources.get('cancel'), function () {
-    if (mxUtils.confirm(mxResources.get('changesNotSaved')+"\n"+mxResources.get('areYouSure'))) {
+    // Check if modified or ask to save
+    let cellValue = editorUi.editor.graph.convertValueToString(shape.state.cell).replace(/(\r\n|\n\r)/g,"\n")
+    let formValue = textarea.value.replace(/(\r\n|\n\r)/g,"\n")
+    console.log(cellValue, formValue, cellValue == formValue, cellValue === formValue)
+    if ( 
+      (cellValue == formValue) || 
+      (mxUtils.confirm(mxResources.get('changesNotSaved')+"\n"+mxResources.get('areYouSure')))
+    ) {
       win.destroy();
     }
   });
@@ -223,7 +230,6 @@ var DialogMermaid = function (editorUi, shape) {
 
   var saveBtn = mxUtils.button(mxResources.get('save'), function (evt) {
     parse(textarea.value, evt);
-    win.destroy();
   });
   buttons.appendChild(saveBtn);
 
