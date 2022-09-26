@@ -228,7 +228,7 @@ mxShapeMermaid.prototype.buildCustomProperties = function (defaults) {
         { name: 'gantt_fontSize', dispName: 'gantt_fontSize', type: 'int', min: 1, max: 1000, defVal: defaults.gantt.fontSize },
         { name: 'gantt_fontFamily', dispName: 'gantt_fontFamily', type: 'string', defVal: defaults.gantt.fontFamily },
         { name: 'gantt_numberSectionStyles', dispName: 'gantt_numberSectionStyles', type: 'int', min: 1, max: 1000, defVal: defaults.gantt.numberSectionStyles },
-        { name: 'gantt_axisFormat', dispName: 'gantt_axisFormat', type: 'string', defVal: defaults.gantt.axisFormat },
+        { name: 'gantt_axisFormat', dispName: 'gantt_axisFormat', type: 'string', defVal: encodeURIComponent(defaults.gantt.axisFormat) },
         { name: 'gantt_useMaxWidth', dispName: 'gantt_useMaxWidth', type: 'bool', defVal: defaults.gantt.useMaxWidth },
     
         { name: 'journey_diagramMarginX', dispName: 'journey_diagramMarginX', type: 'int', min: 1, max: 1000, defVal: defaults.journey.diagramMarginX },
