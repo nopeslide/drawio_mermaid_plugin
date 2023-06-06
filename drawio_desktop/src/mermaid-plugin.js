@@ -51,7 +51,7 @@ var DialogMermaid = function (editorUi, shape) {
         <span style="display: none;"><a id="plugin_mermaid_button_svg" href="#">SVG</a> |  </span>
         <a id="plugin_mermaid_button_png" href="#">PNG</a> | 
         <br />Help | 
-        <a target="_blank" href="https://mermaid-js.github.io/mermaid/#/./n00b-syntaxReference">Syntax</a> |
+        <a target="_blank" href="https://mermaid.js.org/intro/">Syntax</a> |
       </p><br /></div>
      </div>
      <div style="flex: 0 0 32px;"></div>
