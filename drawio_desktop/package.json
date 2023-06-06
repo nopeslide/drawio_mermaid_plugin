@@ -11,7 +11,10 @@
 		"webpack:production": "webpack --mode production",
 		"webpack:development": "webpack --mode development",
 		"build": "npm run webpack:production",
-		"dev": "npm run webpack:development"
+		"dev": "npm run webpack:development",
+		"copy-plugin": "copy /y dist\\mermaid-plugin.webpack.js %appdata%\\draw.io\\plugins\\",
+		"run-drawio": "..\\..\\draw.io-20.3.0-windows-no-installer.exe --args --enable-plugins",
+		"maj-dev": "npm run dev && npm run copy-plugin && npm run run-drawio"
 	},
 	"devDependencies": {
 		"mermaid": "^8.13.3",

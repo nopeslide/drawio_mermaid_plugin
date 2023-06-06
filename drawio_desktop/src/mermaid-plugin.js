@@ -51,7 +51,7 @@ var DialogMermaid = function (editorUi, shape) {
         <span style="display: none;"><a id="plugin_mermaid_button_svg" href="#">SVG</a> |  </span>
         <a id="plugin_mermaid_button_png" href="#">PNG</a> | 
         <br />Help | 
-        <a target="_blank" href="https://mermaid-js.github.io/mermaid/#/./n00b-syntaxReference">Syntax</a> |
+        <a target="_blank" href="https://mermaid.js.org/intro/">Syntax</a> |
       </p><br /></div>
      </div>
      <div style="flex: 0 0 32px;"></div>
@@ -209,8 +209,17 @@ var DialogMermaid = function (editorUi, shape) {
     );
   }
 
-  var cancelBtn = mxUtils.button(mxResources.get('close'), function () {
-    win.destroy();
+  var cancelBtn = mxUtils.button(mxResources.get('cancel'), function () {
+    // Check if modified or ask to save
+    let cellValue = editorUi.editor.graph.convertValueToString(shape.state.cell).replace(/(\r\n|\n\r)/g,"\n")
+    let formValue = textarea.value.replace(/(\r\n|\n\r)/g,"\n")
+    console.log(cellValue, formValue, cellValue == formValue, cellValue === formValue)
+    if ( 
+      (cellValue == formValue) || 
+      (mxUtils.confirm(mxResources.get('changesNotSaved')+"\n"+mxResources.get('areYouSure')))
+    ) {
+      win.destroy();
+    }
   });
 
   cancelBtn.className = 'geBtn';
@@ -219,7 +228,14 @@ var DialogMermaid = function (editorUi, shape) {
     buttons.appendChild(cancelBtn);
   }
 
-  var okBtn = mxUtils.button(mxResources.get('apply'), function (evt) {
+  var saveBtn = mxUtils.button(mxResources.get('save'), function (evt) {
+    parse(textarea.value, evt);
+  });
+  buttons.appendChild(saveBtn);
+
+  saveBtn.className = 'geBtn';
+
+  var okBtn = mxUtils.button(mxResources.get('saveAndExit'), function (evt) {
     parse(textarea.value, evt);
     win.destroy();
   });
@@ -241,12 +257,20 @@ Draw.loadPlugin(function (ui) {
   // Build mermaid settings : by least order
   // - mermaid_plugin_defaults : this plugin defaults
   // - EditorUi.defaultMermaidConfig : drawio defaults mermaid
-  // - Editor.config.defaultMermaidConfig : drawio config (from PreConfig and local configuration)
+  // - window.defaultMermaidConfig : drawio config from PreConfig
+  // - Editor.config.defaultMermaidConfig : drawio config (from PreConfig or local configuration)
 
   let mermaid_settings = {};
   mermaid_settings = merge(mermaid_settings, mermaid_plugin_defaults);
   try {
     mermaid_settings = merge(mermaid_settings, window.EditorUi.defaultMermaidConfig);
+  } catch (e) {
+    if (!e instanceof TypeError) {
+      throw e;
+    }
+  }
+  try {
+    mermaid_settings = merge(mermaid_settings, window.defaultMermaidConfig);
   } catch (e) {
     if (!e instanceof TypeError) {
       throw e;
@@ -404,10 +428,9 @@ Draw.loadPlugin(function (ui) {
 	});
 
 
-
-
-
 });
+
+
 
 
 
